@@ -5,7 +5,6 @@ package simulator;
  */
 public class Main {
     public static void main(String args[]) {
-        MyGUI mygui = new MyGUI();
         Simulator smu = new Simulator();
         smu.writeMemory(1024, 4);
         smu.writeMemory(1028, 8);
