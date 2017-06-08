@@ -10,7 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-
+import java.lang.Math;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -58,6 +58,7 @@ public class MyGUI {
 
     //Button
     JButton runBtn;
+		JButton stepBtn;
     JButton clearBtn;
     JButton stopBtn;
 
@@ -76,24 +77,31 @@ public class MyGUI {
             { "", "", "", "" }};
 	int instTotalNum = 0;
 	int [] instPreStatus;
+	Object[][] exeStatusData ;
 	private void updateMe()
 	{
+		//
 		String memContent="";
 		for(int i = 0; i< smu.memSize; ++i){
-			if(smu.mems.getValue(i)!=0){
-				memContent=memContent+"["+i+"] "+String.valueOf(smu.mems.getValue(i))+"\n";
+			if(smu.mems.getValue(i*4)!=0){
+				memContent=memContent+"["+i*4+"] "+String.valueOf(smu.mems.getValue(i*4))+"\n";
 			}
 		}
 		setMemText(memContent);//所有内存状态
 		setTimeLabel(String.valueOf(smu.clock));
+		//设定浮点寄存器
 		for(int i =0; i<smu.regSize; ++i){
 			setFUTable(String.valueOf(smu.regs.getQi(i)),0,i);
 			setFUTable(String.valueOf(smu.regs.getValue(i)),1,i);
 		}
+		//设定保留站
 		for(int i =0; i<3; ++i){
-			if((smu.adder.rs_id-1)==i)
-				setReservationStationTable(String.valueOf(smu.adder.end_time-smu.clock),i,0);
-			setReservationStationTable(smu.addResStation[i].isBusy().toString(),i,2);
+			System.out.println(smu.adder.getEnd_time() + "-----" + smu.clock);
+			if((smu.adder.getRs_id()-1)==i)
+				setReservationStationTable(String.valueOf(Math.max((smu.adder.getEnd_time()-smu.clock),0)),i,0);
+			else
+				setReservationStationTable("0", i, 0);
+			setReservationStationTable(smu.addResStation[i].isBusy()?"Busy":"Free",i,2);
 			setReservationStationTable(String.valueOf(smu.addResStation[i].getOp()),i,3);
 			setReservationStationTable(String.valueOf(smu.addResStation[i].getVj()),i,4);
 			setReservationStationTable(String.valueOf(smu.addResStation[i].getVk()),i,5);
@@ -102,32 +110,45 @@ public class MyGUI {
 		}
 		for(int i =0; i<2; ++i){
 			int line = i+3;
-			if((smu.multiplier.rs_id-1)==i)
-			  setReservationStationTable(String.valueOf(smu.multiplier.end_time-smu.clock),i,0);
-			setReservationStationTable(smu.mulResStation[i].isBusy().toString(),i,2);
-			setReservationStationTable(String.valueOf(smu.mulResStation[i].getOp()),i,3);
-			setReservationStationTable(String.valueOf(smu.mulResStation[i].getVj()),i,4);
-			setReservationStationTable(String.valueOf(smu.mulResStation[i].getVk()),i,5);
-			setReservationStationTable(String.valueOf(smu.mulResStation[i].getQj()),i,6);
-			setReservationStationTable(String.valueOf(smu.mulResStation[i].getQk()),i,7);
+			if((smu.multiplier.getRs_id()-1)==line)
+				setReservationStationTable(String.valueOf(Math.max((smu.multiplier.getEnd_time()-smu.clock),0)),line,0);
+			else
+				setReservationStationTable("0", line, 0);
+			setReservationStationTable(smu.mulResStation[i].isBusy()?"Busy":"Free",line,2);
+			setReservationStationTable(String.valueOf(smu.mulResStation[i].getOp()),line,3);
+			setReservationStationTable(String.valueOf(smu.mulResStation[i].getVj()),line,4);
+			setReservationStationTable(String.valueOf(smu.mulResStation[i].getVk()),line,5);
+			setReservationStationTable(String.valueOf(smu.mulResStation[i].getQj()),line,6);
+			setReservationStationTable(String.valueOf(smu.mulResStation[i].getQk()),line,7);
 		}
-		for(int i=0; i<3; ++i){
-			setLoadQueueTable(smu.ldResStation[i].isBusy().toString(),i,0);
-			setLoadQueueTable(String.valueOf(smu.ldResStation[i].getA()),i,1);
-			setLoadQueueTable(String.valueOf(smu.regs.get(smu.ldResStation[i].getIns().getRd() ) ),i,2 );
+		try{
+			//设定LoadQue
+			for(int i=0; i<3; ++i){
+				setLoadQueueTable(smu.ldResStation[i].isBusy()?"Busy":"Free",i,0);
+				setLoadQueueTable(String.valueOf(smu.ldResStation[i].getA()),i,1);
+				setLoadQueueTable(String.valueOf(smu.regs.getValue(smu.ldResStation[i].getIns().getRd() ) ),i,2 );
+			}
+		}catch(Exception e){
+			System.out.println(e);
 		}
-		for(int i=0; i<3; ++i){
-			setLoadQueueTable(smu.stResStation[i].isBusy().toString(),i,0);
-			setLoadQueueTable(String.valueOf(smu.stResStation[i].getA()),i,1);
-			setLoadQueueTable(String.valueOf(smu.regs.get(smu.stResStation[i].getIns().getRd() ) ),i,2 );
+		try{
+			for(int i=0; i<3; ++i){
+				setStoreQueueTable(smu.stResStation[i].isBusy()?"Busy":"Free",i,0);
+				setStoreQueueTable(String.valueOf(smu.stResStation[i].getA()),i,1);
+				setStoreQueueTable(String.valueOf(smu.regs.getValue(smu.stResStation[i].getIns().getRd() ) ),i,2 );
+			}
+		}catch(Exception e){
+			System.out.println(e);
 		}
+		//设定运行状态
 		for(int i = 0; i<instTotalNum; ++i){
 			if(instPreStatus[i]!=smu.instructionVector.get(i).getState()){
-				setExeStatusTable(String.valueOf(smu.clock),i,instPreStatus[i]);
+				setExeStatusTable(String.valueOf(smu.clock), i, instPreStatus[i]);
 				instPreStatus[i]+=1;
 			}
 		}
 	}
+
 	public MyGUI()
 	{
 		jf = new JFrame("Tomasulo");
@@ -143,17 +164,13 @@ public class MyGUI {
         instNumTitleLabel.setBounds(700, 500, 100, 20);
         root.add(instNumTitleLabel);
 
-        instNumLabel = new JTextField("0");
+        instNumLabel = new JTextField("10");
         instNumLabel.setBounds(800, 500, 100, 20);
         root.add(instNumLabel);
 
         JLabel PCTitleLabel = new JLabel("PC:");
         PCTitleLabel.setBounds(700, 550, 100, 20);
         root.add(PCTitleLabel);
-
-        PCLabel = new JLabel("0");
-        PCLabel.setBounds(800, 550, 100, 20);
-        root.add(PCLabel);
 
 		runBtn = new JButton("Run N Step");
         runBtn.setBounds(950, 550, 100, 20);
@@ -163,12 +180,22 @@ public class MyGUI {
         runBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 							instNum = Integer.parseInt(instNumLabel.getText());
-							for(int i =0 ; i< instNum; ++i){
+							for(int i =0 ; i < instNum; ++i){
 								smu.step();
+								updateMe();
 							}
-							updateMe();
+
             }
         });
+			stepBtn = new JButton("Run 1 Step");
+	        stepBtn.setBounds(1050, 550, 100, 20);
+	        root.add(stepBtn);
+	        stepBtn.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent e) {
+								smu.step();
+								updateMe();
+	            }
+	        });
 
         clearBtn = new JButton("Reset");
         clearBtn.setBounds(950, 600, 100, 20);
@@ -177,14 +204,13 @@ public class MyGUI {
         //Get inst num and inst
         clearBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+							smu.reset();
             	clearExeStatusTable();
             	clearLoadQueueTable();
             	clearStoreQueueTable();
-            	clearMemTable();
+            	clearMemText();
             	clearReservationStationTable();
             	clearFUTable();
-            	clearRUTable();
-            	clearPCLabel();
             	clearTimeLabel();
             	clearInstNumLabel();
             }
@@ -197,11 +223,11 @@ public class MyGUI {
         //Get inst num and inst
         stopBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-							System.out.println(instructionText.getText());
+							smu.clearIns();
 							smu.readInstruction(instructionText.getText());
 							instTotalNum = smu.instructionVector.size();
 							instPreStatus = new int[instTotalNum];
-							smu.reset();
+
             }
         });
 
@@ -215,7 +241,18 @@ public class MyGUI {
 
 
 		//指令
-		instructionText = new JTextArea();
+		instructionText = new JTextArea("LD F0 1024\n" +
+						"LD F1 1028\n" +
+						"MULD F2 F0 F1\n" +
+						"SUBD F2 F0 F1\n" +
+						"MULD F4 F0 F1\n" +
+						"DIVD F5 F0 F1\n" +
+						"ST F0 0\n" +
+						"ST F1 4\n" +
+						"ST F2 8\n" +
+						"ST F3 12\n" +
+						"ST F4 16\n" +
+						"ST F5 20");
 		JScrollPane insJSP= new JScrollPane(instructionText);
 		insJSP.setBounds(50, 50, 200, 150);
 		root.add(insJSP);
@@ -225,7 +262,6 @@ public class MyGUI {
         root.add(instListLabel);
 
         //表格2
-        Object[][] exeStatusData ;
 				exeStatusData = new Object [40][];
 				for(int i =0; i<40; ++i){
 					exeStatusData[i] = new Object[4];
@@ -292,14 +328,16 @@ public class MyGUI {
       //表格6
         Object[][] reservationStationData = {
                 // 创建表格中的数据
-                { "", "", "", "", "","","",""},
-                { "", "", "", "", "","","","" },
-                { "", "", "", "", "","","","" },};
+                { "", "Add1", "", "", "","","",""},
+                { "", "Add2", "", "", "","","",""},
+								{ "", "Add3", "", "", "","","",""},
+                { "", "Mul1", "", "", "","","",""},
+                { "", "Mul2", "", "", "","","",""},};
         // 创建表格中的横标题
         String[] reservationStationColNames = { "Time","Name","Busy", "Op", "Vi","Vk","Qi","Qk" };
         reservationStationTable = new JTable(reservationStationData,reservationStationColNames);
         JScrollPane reservationStationJSP= new JScrollPane(reservationStationTable);
-        reservationStationJSP.setBounds(400, 300, 500, 100);
+        reservationStationJSP.setBounds(400, 300, 500, 116);
         root.add(reservationStationJSP);
 
         JLabel reservationStationLabel = new JLabel("保留站");
@@ -323,30 +361,12 @@ public class MyGUI {
         FULabel.setBounds(50, 480, 100, 20);
         root.add(FULabel);
 
-      //表格8
-        Object[][] RUData = {
-                // 创建表格中的数据
-                { "", "", "", "", "","","","","","","",""},
-                { "", "", "", "", "","","","","","","",""},
-                };
-        // 创建表格中的横标题
-        String[] RUColNames = { "F0","F1","F2", "F3", "F4","F5","F6","F7","F8","F9","F10" };
-        RUTable = new JTable(RUData,RUColNames);
-        JScrollPane RUJSP= new JScrollPane(RUTable);
-        RUJSP.setBounds(50, 600, 600, 80);
-        root.add(RUJSP);
-
-        JLabel RULabel = new JLabel("整型寄存器RU");
-        RULabel.setBounds(50, 580, 100, 20);
-        root.add(RULabel);
-
         JLabel tmpLabel = new JLabel(" ");
         tmpLabel.setBounds(50, 580, 100, 20);
         root.add(tmpLabel);
 
 
-	    //jf.add(new JScrollPane(root));
-        jf.setContentPane(root);
+    	 jf.setContentPane(root);
 	     jf.setSize(WIDTH, HEIGHT);
 	     jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	     jf.setVisible(true);
@@ -424,21 +444,14 @@ public class MyGUI {
 		public void clearExeStatusTable()
 		{
 			DefaultTableModel tableModel = new DefaultTableModel();
-			Object[][] data = {
-	                // 创建表格中的数据
-	                { "", "", "", "" },
-	                { "", "", "", "" },
-	                { "", "", "", "" },
-	                { "", "", "", "" },
-	                { "", "", "", "" },
-	                { "", "", "", "" },
-	                { "", "", "", "" },
-	                { "", "", "", "" },
-	                { "", "", "", "" },
-	                { "", "", "", "" },};
+			for(int i =0; i<40; ++i){
+				for(int j = 0; j<4; ++j){
+					exeStatusData[i][j]="";
+				}
+			}
 	        // 创建表格中的横标题
 	        String[] columns = { "发射指令", "执行完毕", "写回结果" };
-	        tableModel.setDataVector(data, columns);
+	        tableModel.setDataVector(exeStatusData, columns);
 	        exeStatusTable.setModel(tableModel);
 		}
 		public void clearLoadQueueTable()
@@ -467,7 +480,7 @@ public class MyGUI {
 	        tableModel.setDataVector(data, columns);
 	        storeQueueTable.setModel(tableModel);
 		}
-		public void clearMemTable()
+		public void clearMemText()
 		{
 			memText.setText("");
 		}
@@ -477,9 +490,11 @@ public class MyGUI {
 			DefaultTableModel tableModel = new DefaultTableModel();
 			Object[][] data = {
 	                // 创建表格中的数据
-					{ "", "", "", "", "","","",""},
-	                { "", "", "", "", "","","","" },
-	                { "", "", "", "", "","","","" },};
+					{ "", "Add1", "", "", "","","",""},
+          { "", "Add2", "", "", "","","",""},
+					{ "", "Add3", "", "", "","","",""},
+          { "", "Mul1", "", "", "","","",""},
+          { "", "Mul2", "", "", "","","",""},};
 	        // 创建表格中的横标题
 	        String[] columns = { "Time","Name","Busy", "Op", "Vj","Vk","Qj","Qk" };
 	        tableModel.setDataVector(data, columns);
@@ -498,34 +513,17 @@ public class MyGUI {
 	        tableModel.setDataVector(data, columns);
 	        FUTable.setModel(tableModel);
 		}
-		//设置RU表的内容
-		public void clearRUTable()
-		{
-			DefaultTableModel tableModel = new DefaultTableModel();
-			Object[][] data = {
-	                // 创建表格中的数据
-					{ "", "", "", "", "","","","","","","",""},
-	                { "", "", "", "", "","","","","","","",""},};
-	        // 创建表格中的横标题
-	        String[] columns = { "F0","F1","F2", "F3", "F4","F5","F6","F7","F8","F9","F10"};
-	        tableModel.setDataVector(data, columns);
-	        RUTable.setModel(tableModel);
-		}
-
-		//设置PC label的内容
-		public void clearPCLabel()
-		{
-			PCLabel.setText("0");
-		}
 		public void clearTimeLabel()
 		{
 			timeLabel.setText("0");
 		}
 		public void clearInstNumLabel()
 		{
-			instNumLabel.setText("0");
+			instNumLabel.setText("10");
 		}
-
+		public void clearMiddle(){
+			instTotalNum = 0;
+		}
 		public static void main(String[] args) {
 			MyGUI mygui = new MyGUI();
 			smu = new Simulator();

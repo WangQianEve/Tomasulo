@@ -8,7 +8,7 @@ import java.util.Vector;
  */
 public class Simulator {
 
-    private int clock;
+    public int clock;
     /**
      * currentIns : current instruction to influx
      */
@@ -69,7 +69,10 @@ public class Simulator {
         memory_unit = new Memory_unit();
         memory_queue = new Vector<>();
     }
-
+    public void clearIns() {
+      reset();
+      instructionVector.clear();
+    }
     public void reset(){
         clock = 0;
         currentIns = 0;
@@ -362,6 +365,7 @@ public class Simulator {
             resStation.setBusy(false);
             resStation.getIns().setState(3);
             adder.setBusy(false);
+            adder.reset();
         }
         //multi
         if (multiplier.getEnd_time() == clock) {
@@ -379,6 +383,7 @@ public class Simulator {
             resStation.setBusy(false);
             resStation.getIns().setState(3);
             multiplier.setBusy(false);
+            multiplier.reset();
         }
     }
 
