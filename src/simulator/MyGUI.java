@@ -161,16 +161,12 @@ public class MyGUI {
 		showPanel.setLayout(new BorderLayout());
 
         JLabel instNumTitleLabel = new JLabel("指令数量：");
-        instNumTitleLabel.setBounds(700, 500, 100, 20);
+        instNumTitleLabel.setBounds(700, 550, 100, 20);
         root.add(instNumTitleLabel);
 
         instNumLabel = new JTextField("10");
-        instNumLabel.setBounds(800, 500, 100, 20);
+        instNumLabel.setBounds(800, 550, 100, 20);
         root.add(instNumLabel);
-
-        JLabel PCTitleLabel = new JLabel("PC:");
-        PCTitleLabel.setBounds(700, 550, 100, 20);
-        root.add(PCTitleLabel);
 
 		runBtn = new JButton("Run N Step");
         runBtn.setBounds(950, 550, 100, 20);
@@ -254,7 +250,7 @@ public class MyGUI {
 						"ST F4 16\n" +
 						"ST F5 20");
 		JScrollPane insJSP= new JScrollPane(instructionText);
-		insJSP.setBounds(50, 50, 200, 150);
+		insJSP.setBounds(50, 50, 200, 200);
 		root.add(insJSP);
 
         JLabel instListLabel = new JLabel("指令");
@@ -274,7 +270,7 @@ public class MyGUI {
         String[] exeStatusColNames = { "发射指令", "执行完毕", "写回结果" };
         exeStatusTable = new JTable(exeStatusData,exeStatusColNames);
         JScrollPane exeStatusJSP= new JScrollPane(exeStatusTable);
-        exeStatusJSP.setBounds(400, 50, 200, 150); ;
+        exeStatusJSP.setBounds(400, 50, 200, 200); ;
         root.add(exeStatusJSP);
 
         JLabel exeStatusLabel = new JLabel("运行状态");
@@ -318,11 +314,11 @@ public class MyGUI {
       //表格5
 			memText = new JTextArea();
         JScrollPane memJSP= new JScrollPane(memText);
-        memJSP.setBounds(50, 300, 200, 75);
+        memJSP.setBounds(50, 300, 200, 200);
         root.add(memJSP);
 
         JLabel memLabel = new JLabel("内存");
-        memLabel.setBounds(50, 280, 100, 20);
+        memLabel.setBounds(50, 270, 100, 20);
         root.add(memLabel);
 
       //表格6
@@ -337,11 +333,11 @@ public class MyGUI {
         String[] reservationStationColNames = { "Time","Name","Busy", "Op", "Vi","Vk","Qi","Qk" };
         reservationStationTable = new JTable(reservationStationData,reservationStationColNames);
         JScrollPane reservationStationJSP= new JScrollPane(reservationStationTable);
-        reservationStationJSP.setBounds(400, 300, 500, 116);
+        reservationStationJSP.setBounds(400, 350, 500, 116);
         root.add(reservationStationJSP);
 
         JLabel reservationStationLabel = new JLabel("保留站");
-        reservationStationLabel.setBounds(450, 280, 100, 20);
+        reservationStationLabel.setBounds(400, 330, 100, 20);
         root.add(reservationStationLabel);
 
       //表格7
@@ -354,11 +350,11 @@ public class MyGUI {
         String[] FUColNames = { "F0","F1","F2", "F3", "F4","F5","F6","F7","F8","F9","F10" };
         FUTable = new JTable(FUData,FUColNames);
         JScrollPane FUJSP= new JScrollPane(FUTable);
-        FUJSP.setBounds(50, 500, 600, 80);
+        FUJSP.setBounds(50, 550, 600, 80);
         root.add(FUJSP);
 
         JLabel FULabel = new JLabel("浮点寄存器FU");
-        FULabel.setBounds(50, 480, 100, 20);
+        FULabel.setBounds(50, 530, 100, 20);
         root.add(FULabel);
 
         JLabel tmpLabel = new JLabel(" ");
