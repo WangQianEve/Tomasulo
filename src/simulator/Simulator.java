@@ -246,8 +246,72 @@ public class Simulator {
 
     }
 
-    private void update(){
+    private void updateResStation(ResStation[] resStations, int id, float result){
+        for (ResStation resStation : resStations) {
+            if (resStation.getQj() == id){
+                resStation.setQj(0);
+                resStation.setVj(result);
+            }
+            if (resStation.getQk() == id){
+                resStation.setQk(0);
+                resStation.setVk(result);
+            }
+        }
+    }
 
+    private void update(){
+        //load&store
+        if (memory_unit.getEnd_time() == clock){
+            ResStation resStation = memory_queue.firstElement();
+            Instruction instruction = resStation.getIns();
+            if (instruction.getOp() == "LD") {
+                regs.setQi(instruction.getRd(), 0);
+                regs.setValue(instruction.getRd(), memory_unit.getResult());
+                updateResStation(addResStation, resStation.getId(), memory_unit.getResult());
+                updateResStation(mulResStation, resStation.getId(), memory_unit.getResult());
+                updateResStation(ldResStation, resStation.getId(), memory_unit.getResult());
+                updateResStation(stResStation, resStation.getId(), memory_unit.getResult());
+            }
+            else {
+                mems.setValue(resStation.getA()/4, memory_unit.getResult());
+            }
+            resStation.setBusy(false);
+            instruction.setState(3);
+        }
+        //adder
+        if (adder.getEnd_time() == clock) {
+            ResStation resStation = addResStation[adder.getRs_id()];
+            for (int i = 0; i < regSize; i++){
+                if (regs.getQi(i) == adder.getRs_id()){
+                    regs.setQi(i, 0);
+                    regs.setValue(i, adder.getResult());
+                }
+            }
+            updateResStation(addResStation, resStation.getId(), adder.getResult());
+            updateResStation(mulResStation, resStation.getId(), adder.getResult());
+            updateResStation(ldResStation, resStation.getId(), adder.getResult());
+            updateResStation(stResStation, resStation.getId(), adder.getResult());
+            resStation.setBusy(false);
+            resStation.getIns().setState(3);
+            adder.setBusy(false);
+        }
+        //multi
+        if (multiplier.getEnd_time() == clock) {
+            ResStation resStation = mulResStation[multiplier.getRs_id() - 3];
+            for (int i = 0; i < regSize; i++){
+                if (regs.getQi(i) == resStation.getId()){
+                    regs.setQi(i, 0);
+                    regs.setValue(i, multiplier.getResult());
+                }
+            }
+            updateResStation(addResStation, resStation.getId(), multiplier.getResult());
+            updateResStation(mulResStation, resStation.getId(), multiplier.getResult());
+            updateResStation(ldResStation, resStation.getId(), multiplier.getResult());
+            updateResStation(stResStation, resStation.getId(), multiplier.getResult());
+            resStation.setBusy(false);
+            resStation.getIns().setState(3);
+            multiplier.setBusy(false);
+        }
     }
 
     public boolean done(){
