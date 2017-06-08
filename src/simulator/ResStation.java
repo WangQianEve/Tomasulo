@@ -11,7 +11,10 @@ public class ResStation {
     private String op;
     private boolean busy;
     private Instruction ins;
-
+    public int getId(){
+      return id;
+    }
+    
     public void reset(){
         Qj = Qk = A = 0;
         Vj = Vk = 0;
