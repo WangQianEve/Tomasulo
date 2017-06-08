@@ -11,8 +11,8 @@ public class Main {
         smu.writeMemory(1028, 8);
         String instructions = "LD F0 1024\n" +
                 "LD F1 1028\n" +
-                "ADDD F2 F0 F1\n" +
-                "SUBD F3 F0 F1\n" +
+                "MULD F2 F0 F1\n" +
+                "SUBD F2 F0 F1\n" +
                 "MULD F4 F0 F1\n" +
                 "DIVD F5 F0 F1\n" +
                 "ST F0 0\n" +
@@ -22,6 +22,6 @@ public class Main {
                 "ST F4 16\n" +
                 "ST F5 20";
         smu.readInstruction(instructions);
-        smu.run(true, 0);
+        smu.run(true,  0);
     }
 }

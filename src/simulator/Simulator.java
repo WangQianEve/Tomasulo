@@ -12,22 +12,22 @@ public class Simulator {
     /**
      * currentIns : current instruction to influx
      */
-    private Vector<Instruction> instructionVector;
-    private int currentIns;
+    public Vector<Instruction> instructionVector;
+    public int currentIns;
 
-    private int regSize;
-    private Registers regs;
-    private int memSize;
-    private Memory mems;
+    public int regSize;
+    public Registers regs;
+    public int memSize;
+    public Memory mems;
 
-    private ResStation []addResStation;//0-2
-    private ResStation []mulResStation;//3-4
-    private ResStation []ldResStation;//5-7
-    private ResStation []stResStation;//8-10
+    public ResStation []addResStation;//0-2
+    public ResStation []mulResStation;//3-4
+    public ResStation []ldResStation;//5-7
+    public ResStation []stResStation;//8-10
 
-    private Adder adder;
-    private Multiplier multiplier;
-    private Memory_unit memory_unit;
+    public Adder adder;
+    public Multiplier multiplier;
+    public Memory_unit memory_unit;
 
     private Vector<ResStation> memory_queue;
 
@@ -35,7 +35,7 @@ public class Simulator {
         clock = 0;
         currentIns = 0;
         instructionVector = new Vector<>();
-        regSize = 32;
+        regSize = 11;
         memSize = 1024;
         regs = new Registers(regSize);
         mems = new Memory(memSize);
