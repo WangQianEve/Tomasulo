@@ -114,10 +114,11 @@ public class Simulator {
             if ((max_step > 0) && (steps == max_step)) break;
             steps++;
             if (debug){
-                print_state();
-                print_regs();
-                print_rs();
-                print_units();
+                //print_state();
+                //print_regs();
+                //print_rs();
+                //print_units();
+                print_mems();
             }
         }
     }
@@ -163,6 +164,12 @@ public class Simulator {
 
         System.out.printf("mul unit: rs_id: %d, result: %f, busy: %b, end_time: %d%n",
                 multiplier.getRs_id(), multiplier.getResult(), multiplier.isBusy(), multiplier.getEnd_time());
+    }
+
+    private void print_mems(){
+        for (int i = 0; i < memSize; i++)
+            if (mems.getValue(i * 4) != 0)
+                System.out.println("mem[" + i * 4 + "]=" + mems.getValue(i * 4));
     }
 
     public void step(){
@@ -343,7 +350,7 @@ public class Simulator {
                 updateResStation(stResStation, resStation.getId(), memory_unit.getResult());
             }
             else {
-                mems.setValue(resStation.getA()/4, memory_unit.getResult());
+                mems.setValue(resStation.getA(), memory_unit.getResult());
             }
             resStation.setBusy(false);
             instruction.setState(3);
