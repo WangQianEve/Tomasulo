@@ -38,10 +38,27 @@ public class Simulator {
         memSize = 1024;
         regs = new Registers(regSize);
         mems = new Memory(memSize);
+        int id = 0;
         addResStation = new ResStation[3];
+        for (ResStation resStation : addResStation){
+            resStation.setId(id);
+            id++;
+        }
         mulResStation = new ResStation[2];
+        for (ResStation resStation : mulResStation){
+            resStation.setId(id);
+            id++;
+        }
         ldResStation = new ResStation[3];
+        for (ResStation resStation : ldResStation){
+            resStation.setId(id);
+            id++;
+        }
         stResStation = new ResStation[3];
+        for (ResStation resStation : stResStation){
+            resStation.setId(id);
+            id++;
+        }
         adder = new Adder();
         multiplier = new Multiplier();
         memory_unit = new Memory_unit();
@@ -191,7 +208,7 @@ public class Simulator {
                 if ((instruction.getOp() == "LD") || (instruction.getOp() == "ST")) {
                     resStation.setA(instruction.getRs());
                     if (instruction.getOp() == "LD") {
-                        regs.setQi(instruction.getRd(), i);
+                        regs.setQi(instruction.getRd(), resStation.getId());
                     } else { //STORE
                         if (regs.getQi(instruction.getRd()) == 0) {
                             resStation.setQj(0);
@@ -217,7 +234,7 @@ public class Simulator {
                     else
                         resStation.setQk(regs.getQi(instruction.getRt()));
 
-                    regs.setQi(instruction.getRd(), i);
+                    regs.setQi(instruction.getRd(), resStation.getId());
                 }
                 currentIns++;
                 break;

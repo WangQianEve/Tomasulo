@@ -4,6 +4,7 @@ package simulator;
  * Created by bob35 on 2017/6/8.
  */
 public class ResStation {
+    private int id;
     private int Qj, Qk;
     private float Vj, Vk;
     private int A;
@@ -19,11 +20,12 @@ public class ResStation {
         ins = null;
     }
 
-    public ResStation(String op, Instruction ins){
-        this(0, 0, 0, 0, 0, op, false, ins);
+    public ResStation(){
+        this(0, 0, 0, 0, 0, 0, "", false, null);
     }
 
-    public ResStation(int qj, int qk, float vj, float vk, int a, String op, boolean busy, Instruction ins) {
+    public ResStation(int id, int qj, int qk, float vj, float vk, int a, String op, boolean busy, Instruction ins) {
+        this.id = id;
         Qj = qj;
         Qk = qk;
         Vj = vj;
@@ -34,6 +36,13 @@ public class ResStation {
         this.ins = ins;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getQk() {
         return Qk;
