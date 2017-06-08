@@ -78,6 +78,23 @@ public class MyGUI {
 	int instTotalNum = 0;
 	int [] instPreStatus;
 	Object[][] exeStatusData ;
+	private String transferResStation(int c){
+		switch(c){
+			case 0: return "";
+			case 1: return "Add1";
+			case 2: return "Add2";
+			case 3: return "Add3";
+			case 4: return "Mul1";
+			case 5: return "Mul2";
+			case 6: return "Load1";
+			case 7: return "Load2";
+			case 8: return "Load3";
+			case 9: return "Store1";
+			case 10: return "Store2";
+			case 11: return "Store3";
+			default: return "";
+		}
+	}
 	private void updateMe()
 	{
 		//
@@ -91,7 +108,7 @@ public class MyGUI {
 		setTimeLabel(String.valueOf(smu.clock));
 		//设定浮点寄存器
 		for(int i =0; i<smu.regSize; ++i){
-			setFUTable(String.valueOf(smu.regs.getQi(i)),0,i);
+			setFUTable(transferResStation(smu.regs.getQi(i)),0,i);
 			setFUTable(String.valueOf(smu.regs.getValue(i)),1,i);
 		}
 		//设定保留站
@@ -105,8 +122,8 @@ public class MyGUI {
 			setReservationStationTable(String.valueOf(smu.addResStation[i].getOp()),i,3);
 			setReservationStationTable(String.valueOf(smu.addResStation[i].getVj()),i,4);
 			setReservationStationTable(String.valueOf(smu.addResStation[i].getVk()),i,5);
-			setReservationStationTable(String.valueOf(smu.addResStation[i].getQj()),i,6);
-			setReservationStationTable(String.valueOf(smu.addResStation[i].getQk()),i,7);
+			setReservationStationTable(transferResStation(smu.addResStation[i].getQj()),i,6);
+			setReservationStationTable(transferResStation(smu.addResStation[i].getQk()),i,7);
 		}
 		for(int i =0; i<2; ++i){
 			int line = i+3;
@@ -118,8 +135,8 @@ public class MyGUI {
 			setReservationStationTable(String.valueOf(smu.mulResStation[i].getOp()),line,3);
 			setReservationStationTable(String.valueOf(smu.mulResStation[i].getVj()),line,4);
 			setReservationStationTable(String.valueOf(smu.mulResStation[i].getVk()),line,5);
-			setReservationStationTable(String.valueOf(smu.mulResStation[i].getQj()),line,6);
-			setReservationStationTable(String.valueOf(smu.mulResStation[i].getQk()),line,7);
+			setReservationStationTable(transferResStation(smu.mulResStation[i].getQj()),line,6);
+			setReservationStationTable(transferResStation(smu.mulResStation[i].getQk()),line,7);
 		}
 		try{
 			//设定LoadQue
@@ -168,7 +185,7 @@ public class MyGUI {
         instNumLabel.setBounds(800, 550, 100, 20);
         root.add(instNumLabel);
 
-		runBtn = new JButton("Run N Step");
+		runBtn = new JButton("Run N Steps");
         runBtn.setBounds(950, 550, 100, 20);
         root.add(runBtn);
         //Btn action
@@ -333,13 +350,20 @@ public class MyGUI {
         String[] reservationStationColNames = { "Time","Name","Busy", "Op", "Vi","Vk","Qi","Qk" };
         reservationStationTable = new JTable(reservationStationData,reservationStationColNames);
         JScrollPane reservationStationJSP= new JScrollPane(reservationStationTable);
-        reservationStationJSP.setBounds(400, 350, 500, 116);
+        reservationStationJSP.setBounds(400, 370, 500, 110);
         root.add(reservationStationJSP);
 
         JLabel reservationStationLabel = new JLabel("保留站");
-        reservationStationLabel.setBounds(400, 330, 100, 20);
+        reservationStationLabel.setBounds(400, 350, 100, 20);
         root.add(reservationStationLabel);
-
+				JTextArea inst = new JTextArea("请在修改指令后 或 执行前先点击Load Inst按钮以读取指令\n\nRun N Steps根据左边的文本框中数字执行指令条数");
+				// JLabel inst = new JLabel("请在修改指令后 或 执行前先</br>点击Load Inst按钮以读取指令</br></br>Run N Steps根据左边的文本框中</br>数字执行指令条数");
+				inst.setLineWrap(true);
+				inst.setWrapStyleWord(true);
+				inst.setEditable(false);
+        inst.setBounds(950, 370, 200, 100);
+				inst.setBackground(new Color(238,238,238));
+        root.add(inst);
       //表格7
         Object[][] FUData = {
                 // 创建表格中的数据
