@@ -35,6 +35,10 @@ public class Instruction {
         parse(ins);
     }
 
+    public void reset(){
+        state = 0;
+    }
+
     private void parse(String ins) {
         this.state = 0;
         this.time_cost = 0;
