@@ -40,23 +40,27 @@ public class Simulator {
         mems = new Memory(memSize);
         int id = 0;
         addResStation = new ResStation[3];
-        for (ResStation resStation : addResStation){
-            resStation.setId(id);
+        for (int i = 0; i < 3; i++){
+            addResStation[i] = new ResStation();
+            addResStation[i].setId(id);
             id++;
         }
         mulResStation = new ResStation[2];
-        for (ResStation resStation : mulResStation){
-            resStation.setId(id);
+        for (int i = 0; i < 2; i++){
+            mulResStation[i] = new ResStation();
+            mulResStation[i].setId(id);
             id++;
         }
         ldResStation = new ResStation[3];
-        for (ResStation resStation : ldResStation){
-            resStation.setId(id);
+        for (int i = 0; i < 3; i++){
+            ldResStation[i] = new ResStation();
+            ldResStation[i].setId(id);
             id++;
         }
         stResStation = new ResStation[3];
-        for (ResStation resStation : stResStation){
-            resStation.setId(id);
+        for (int i = 0; i < 3; i++){
+            stResStation[i] = new ResStation();
+            stResStation[i].setId(id);
             id++;
         }
         adder = new Adder();
@@ -125,32 +129,32 @@ public class Simulator {
     private void print_rs(){
         int label = 0;
         for (ResStation res : addResStation) {
-            System.out.printf("RS #%d, Op: %s, Qj: %d, Qk: %d, Vj: %d, Vk: %d, busy: %d, A: %d%n",
+            System.out.printf("RS #%d, Op: %s, Qj: %d, Qk: %d, Vj: %f, Vk: %f, busy: %b, A: %d%n",
                     label, res.getOp(), res.getQj(), res.getQk(), res.getVj(), res.getVk(), res.isBusy(), res.getA());
             label++;
         }
         for (ResStation res : mulResStation) {
-            System.out.printf("RS #%d, Op: %s, Qj: %d, Qk: %d, Vj: %d, Vk: %d, busy: %d, A: %d%n",
+            System.out.printf("RS #%d, Op: %s, Qj: %d, Qk: %d, Vj: %f, Vk: %f, busy: %b, A: %d%n",
                     label, res.getOp(), res.getQj(), res.getQk(), res.getVj(), res.getVk(), res.isBusy(), res.getA());
             label++;
         }
         for (ResStation res : ldResStation) {
-            System.out.printf("RS #%d, Op: %s, Qj: %d, Qk: %d, Vj: %d, Vk: %d, busy: %d, A: %d%n",
+            System.out.printf("RS #%d, Op: %s, Qj: %d, Qk: %d, Vj: %f, Vk: %f, busy: %b, A: %d%n",
                     label, res.getOp(), res.getQj(), res.getQk(), res.getVj(), res.getVk(), res.isBusy(), res.getA());
             label++;
         }
         for (ResStation res : stResStation) {
-            System.out.printf("RS #%d, Op: %s, Qj: %d, Qk: %d, Vj: %d, Vk: %d, busy: %d, A: %d%n",
+            System.out.printf("RS #%d, Op: %s, Qj: %d, Qk: %d, Vj: %f, Vk: %f, busy: %b, A: %d%n",
                     label, res.getOp(), res.getQj(), res.getQk(), res.getVj(), res.getVk(), res.isBusy(), res.getA());
             label++;
         }
     }
 
     private void print_units(){
-        System.out.printf("add unit: rs_id: %d, result: %f, busy: %d, end_time: %d%n",
+        System.out.printf("add unit: rs_id: %d, result: %f, busy: %b, end_time: %d%n",
                 adder.getRs_id(), adder.getResult(), adder.isBusy(), adder.getEnd_time());
 
-        System.out.printf("mul unit: rs_id: %d, result: %f, busy: %d, end_time: %d%n",
+        System.out.printf("mul unit: rs_id: %d, result: %f, busy: %b, end_time: %d%n",
                 multiplier.getRs_id(), multiplier.getResult(), multiplier.isBusy(), multiplier.getEnd_time());
     }
 
