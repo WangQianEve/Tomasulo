@@ -1,5 +1,6 @@
 package simulator;
 
+import java.util.Objects;
 import java.util.Vector;
 
 /**
@@ -102,10 +103,13 @@ public class Simulator {
         return mems.getValue(index);
     }
 
-    public void run(boolean debug){
+    public void run(boolean debug, int max_step){
         this.reset();
+        int steps = 0;
         while (!this.done()){
             step();
+            if ((max_step > 0) && (steps == max_step)) break;
+            steps++;
             if (debug){
                 print_state();
                 print_regs();
@@ -209,9 +213,9 @@ public class Simulator {
                 resStation.setIns(instruction);
                 resStation.setOp(instruction.getOp());
                 instruction.setState(1);
-                if ((instruction.getOp() == "LD") || (instruction.getOp() == "ST")) {
+                if ((Objects.equals(instruction.getOp(), "LD")) || (Objects.equals(instruction.getOp(), "ST"))) {
                     resStation.setA(instruction.getRs());
-                    if (instruction.getOp() == "LD") {
+                    if (Objects.equals(instruction.getOp(), "LD")) {
                         regs.setQi(instruction.getRd(), resStation.getId());
                     } else { //STORE
                         if (regs.getQi(instruction.getRd()) == 0) {
@@ -251,7 +255,7 @@ public class Simulator {
       if(memory_queue.size()>0){
         curRes = memory_queue.get(0);
         if(curRes.getIns().getState()<2){
-          if(curRes.getOp()=="LD"){
+          if(Objects.equals(curRes.getOp(), "LD")){
             memory_unit.setResult(mems.getValue(curRes.getA()));
             curRes.getIns().setState(2);
             memory_unit.setRs_id(curRes.getId());
@@ -271,7 +275,7 @@ public class Simulator {
           if(resStation.getQj()==0 && resStation.getQk()==0 && resStation.isBusy()){
             float a = resStation.getVj();
             float b = resStation.getVk();
-            if(resStation.getOp()=="ADDD"){
+            if(Objects.equals(resStation.getOp(), "ADDD")){
               adder.setResult(a+b);
             }
             else{
@@ -291,7 +295,7 @@ public class Simulator {
           if(resStation.getQj()==0 && resStation.getQk()==0 && resStation.isBusy()){
             float a = resStation.getVj();
             float b = resStation.getVk();
-            if(resStation.getOp()=="MULD"){
+            if(Objects.equals(resStation.getOp(), "MULD")){
               multiplier.setResult(a*b);
               multiplier.setEnd_time(clock+10);
             }
@@ -327,7 +331,7 @@ public class Simulator {
         if (memory_unit.getEnd_time() == clock){
             ResStation resStation = memory_queue.firstElement();
             Instruction instruction = resStation.getIns();
-            if (instruction.getOp() == "LD") {
+            if (Objects.equals(instruction.getOp(), "LD")) {
                 regs.setQi(instruction.getRd(), 0);
                 regs.setValue(instruction.getRd(), memory_unit.getResult());
                 updateResStation(addResStation, resStation.getId(), memory_unit.getResult());
@@ -340,6 +344,7 @@ public class Simulator {
             }
             resStation.setBusy(false);
             instruction.setState(3);
+            memory_queue.removeElementAt(0);
         }
         //adder
         if (adder.getEnd_time() == clock) {

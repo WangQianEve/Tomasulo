@@ -23,6 +23,6 @@ public class Main {
                 "ST F4 16\n" +
                 "ST F5 20";
         smu.readInstruction(instructions);
-        smu.run(true);
+        smu.run(true, 0);
     }
 }
