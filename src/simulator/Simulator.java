@@ -8,7 +8,7 @@ import java.util.Vector;
  */
 public class Simulator {
 
-    private int clock;
+    public int clock;
     /**
      * currentIns : current instruction to influx
      */
