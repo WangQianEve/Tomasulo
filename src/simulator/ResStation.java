@@ -4,13 +4,17 @@ package simulator;
  * Created by bob35 on 2017/6/8.
  */
 public class ResStation {
+    private int id;
     private int Qj, Qk;
     private float Vj, Vk;
     private int A;
     private String op;
     private boolean busy;
     private Instruction ins;
-
+    public int getId(){
+      return id;
+    }
+    
     public void reset(){
         Qj = Qk = A = 0;
         Vj = Vk = 0;
