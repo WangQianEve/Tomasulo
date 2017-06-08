@@ -19,10 +19,10 @@ public class Simulator {
     private int memSize;
     private Memory mems;
 
-    private ResStation []addResStation;
-    private ResStation []mulResStation;
-    private ResStation []ldResStation;
-    private ResStation []stResStation;
+    private ResStation []addResStation;//0-2
+    private ResStation []mulResStation;//3-4
+    private ResStation []ldResStation;//5-7
+    private ResStation []stResStation;//8-10
 
     private Adder adder;
     private Multiplier multiplier;
@@ -243,7 +243,66 @@ public class Simulator {
     }
 
     private void exec(){
-
+      ResStation curRes;
+      if(memory_queue.size()>0){
+        curRes = memory_queue.get(0);
+        if(curRes.getIns().getState()<2){
+          if(curRes.getOp()=="LD"){
+            memory_unit.setResult(mems.getValue(curRes.getA()));
+            curRes.getIns().setState(2);
+            memory_unit.setRs_id(curRes.getId());
+            memory_unit.setEnd_time(clock+2);
+          }else{
+            if(curRes.getQj()==0){
+              memory_unit.setResult(curRes.getVj());
+              curRes.getIns().setState(2);
+              memory_unit.setRs_id(curRes.getId());
+              memory_unit.setEnd_time(clock+2);
+            }
+          }
+        }
+      }
+      if(!adder.isBusy()){
+        for(ResStation resStation: addResStation){
+          if(resStation.getQj()==0 && resStation.getQk()==0 && resStation.isBusy()){
+            float a = resStation.getVj();
+            float b = resStation.getVk();
+            if(resStation.getOp()=="ADDD"){
+              adder.setResult(a+b);
+            }
+            else{
+              adder.setResult(a-b);
+            }
+            System.out.println("Add result: "+adder.getResult());
+            adder.setRs_id(resStation.getId());
+            adder.setEnd_time(clock+2);
+            adder.setBusy(true);
+            resStation.getIns().setState(2);
+            break;
+          }
+        }
+      }
+      if(!multiplier.isBusy()){
+        for(ResStation resStation: mulResStation){
+          if(resStation.getQj()==0 && resStation.getQk()==0 && resStation.isBusy()){
+            float a = resStation.getVj();
+            float b = resStation.getVk();
+            if(resStation.getOp()=="MULD"){
+              multiplier.setResult(a*b);
+              multiplier.setEnd_time(clock+10);
+            }
+            else{
+              multiplier.setResult(a/b);
+              multiplier.setEnd_time(clock+40);
+            }
+            System.out.println("Mul result: "+multiplier.getResult());
+            multiplier.setRs_id(resStation.getId());
+            multiplier.setBusy(true);
+            resStation.getIns().setState(2);
+            break;
+          }
+        }
+      }
     }
 
     private void updateResStation(ResStation[] resStations, int id, float result){
@@ -321,4 +380,7 @@ public class Simulator {
         return true;
     }
 
+    public static void main(String []args) {
+        System.out.println("Hello World");
+    }
 }
