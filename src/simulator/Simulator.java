@@ -39,7 +39,7 @@ public class Simulator {
         memSize = 1024;
         regs = new Registers(regSize);
         mems = new Memory(memSize);
-        int id = 0;
+        int id = 1;
         addResStation = new ResStation[3];
         for (int i = 0; i < 3; i++){
             addResStation[i] = new ResStation();
@@ -348,9 +348,9 @@ public class Simulator {
         }
         //adder
         if (adder.getEnd_time() == clock) {
-            ResStation resStation = addResStation[adder.getRs_id()];
+            ResStation resStation = addResStation[adder.getRs_id() - 1];
             for (int i = 0; i < regSize; i++){
-                if (regs.getQi(i) == adder.getRs_id()){
+                if (regs.getQi(i) == resStation.getId()){
                     regs.setQi(i, 0);
                     regs.setValue(i, adder.getResult());
                 }
@@ -365,7 +365,7 @@ public class Simulator {
         }
         //multi
         if (multiplier.getEnd_time() == clock) {
-            ResStation resStation = mulResStation[multiplier.getRs_id() - 3];
+            ResStation resStation = mulResStation[multiplier.getRs_id() - 4];
             for (int i = 0; i < regSize; i++){
                 if (regs.getQi(i) == resStation.getId()){
                     regs.setQi(i, 0);
