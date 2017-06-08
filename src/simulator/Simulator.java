@@ -90,36 +90,139 @@ public class Simulator {
                 print_regs();
                 print_rs();
                 print_units();
-                print_mems();
             }
         }
     }
 
     private void print_state() {
+        System.out.println("clock = " + clock);
+        for (Instruction ins : instructionVector)
+            ins.print();
     }
 
     private void print_regs(){
-
+        for (int i = 0; i < regSize; i++)
+            System.out.printf("Registers: Q[%d]: %d, Value[%d]: %f%n", i, regs.getQi(i), i, regs.getValue(i));
     }
 
     private void print_rs(){
-
+        int label = 0;
+        for (ResStation res : addResStation) {
+            System.out.printf("RS #%d, Op: %s, Qj: %d, Qk: %d, Vj: %d, Vk: %d, busy: %d, A: %d%n",
+                    label, res.getOp(), res.getQj(), res.getQk(), res.getVj(), res.getVk(), res.isBusy(), res.getA());
+            label++;
+        }
+        for (ResStation res : mulResStation) {
+            System.out.printf("RS #%d, Op: %s, Qj: %d, Qk: %d, Vj: %d, Vk: %d, busy: %d, A: %d%n",
+                    label, res.getOp(), res.getQj(), res.getQk(), res.getVj(), res.getVk(), res.isBusy(), res.getA());
+            label++;
+        }
+        for (ResStation res : ldResStation) {
+            System.out.printf("RS #%d, Op: %s, Qj: %d, Qk: %d, Vj: %d, Vk: %d, busy: %d, A: %d%n",
+                    label, res.getOp(), res.getQj(), res.getQk(), res.getVj(), res.getVk(), res.isBusy(), res.getA());
+            label++;
+        }
+        for (ResStation res : stResStation) {
+            System.out.printf("RS #%d, Op: %s, Qj: %d, Qk: %d, Vj: %d, Vk: %d, busy: %d, A: %d%n",
+                    label, res.getOp(), res.getQj(), res.getQk(), res.getVj(), res.getVk(), res.isBusy(), res.getA());
+            label++;
+        }
     }
 
     private void print_units(){
+        System.out.printf("add unit: rs_id: %d, result: %f, busy: %d, end_time: %d%n",
+                adder.getRs_id(), adder.getResult(), adder.isBusy(), adder.getEnd_time());
 
-    }
-
-    private void print_mems(){
-
+        System.out.printf("mul unit: rs_id: %d, result: %f, busy: %d, end_time: %d%n",
+                multiplier.getRs_id(), multiplier.getResult(), multiplier.isBusy(), multiplier.getEnd_time());
     }
 
     public void step(){
-
+        clock += 1;
+        update();
+        exec();
+        influx();
     }
 
-    private void influx(){
+    private ResStation[] getResStations(String op){
+        ResStation []resStations;
+        switch (op){
+            case "ADDD":
 
+            case "SUBD":
+                resStations = addResStation;
+                break;
+
+            case "MULD":
+
+            case "DIVD":
+                resStations = mulResStation;
+                break;
+
+            case "LD":
+                resStations = ldResStation;
+                break;
+
+            case "ST":
+                resStations = stResStation;
+                break;
+
+            default:
+                resStations = null;
+        }
+        return resStations;
+    }
+
+    /**
+     * function: influx a new instruction
+     */
+    private void influx(){
+        if (this.currentIns >= instructionVector.size())
+            return ;
+        Instruction instruction = instructionVector.get(currentIns);
+        ResStation[] resStations = getResStations(instruction.getOp());
+        for (int i = 0; i < resStations.length; i++) {
+            ResStation resStation = resStations[i];
+            if (!resStation.isBusy()) {
+                resStation.setBusy(true);
+                resStation.setIns(instruction);
+                resStation.setOp(instruction.getOp());
+                instruction.setState(1);
+                if ((instruction.getOp() == "LD") || (instruction.getOp() == "ST")) {
+                    resStation.setA(instruction.getRs());
+                    if (instruction.getOp() == "LD") {
+                        regs.setQi(instruction.getRd(), i);
+                    } else { //STORE
+                        if (regs.getQi(instruction.getRd()) == 0) {
+                            resStation.setQj(0);
+                            resStation.setVj(regs.getValue(instruction.getRd()));
+                        }
+                        else {
+                            resStation.setQj(regs.getQi(instruction.getRd()));
+                        }
+                    }
+                    this.memory_queue.add(resStation);
+                } else {// ADDD SUBD MULD DIVD
+                    if (regs.getQi(instruction.getRs()) == 0){
+                        resStation.setQj(0);
+                        resStation.setVj(regs.getValue(instruction.getRs()));
+                    }
+                    else
+                        resStation.setQj(regs.getQi(instruction.getRs()));
+
+                    if (regs.getQi(instruction.getRt()) == 0){
+                        resStation.setQk(0);
+                        resStation.setVk(regs.getValue(instruction.getRt()));
+                    }
+                    else
+                        resStation.setQk(regs.getQi(instruction.getRt()));
+
+                    regs.setQi(instruction.getRd(), i);
+                }
+                currentIns++;
+                break;
+            }
+        }
     }
 
     private void exec(){

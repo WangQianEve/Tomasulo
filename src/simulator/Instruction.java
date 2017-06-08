@@ -92,11 +92,11 @@ public class Instruction {
             System.out.println("wrong instruction format");
             return;
         }
-        System.out.printf("op = %s%n", op);
-        System.out.printf("time_cost = %d%n", time_cost);
-        System.out.printf("rs = %d%n", rs);
-        System.out.printf("rt = %d%n", rt);
-        System.out.printf("rd = %d%n", rd);
+        System.out.printf("op = %s ", op);
+        System.out.printf("time_cost = %d ", time_cost);
+        System.out.printf("rs = %d ", rs);
+        System.out.printf("rt = %d ", rt);
+        System.out.printf("rd = %d ", rd);
         System.out.printf("state = %d%n", state);
     }
 
@@ -122,5 +122,9 @@ public class Instruction {
 
     public void setState(int state){
         this.state = state;
+    }
+
+    public String getOp(){
+        return this.op;
     }
 }
