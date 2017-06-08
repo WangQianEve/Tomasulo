@@ -113,7 +113,7 @@ public class MyGUI {
 		}
 		//设定保留站
 		for(int i =0; i<3; ++i){
-			System.out.println(smu.adder.getEnd_time() + "-----" + smu.clock);
+			//System.out.println(smu.adder.getEnd_time() + "-----" + smu.clock);
 			if((smu.adder.getRs_id()-1)==i)
 				setReservationStationTable(String.valueOf(Math.max((smu.adder.getEnd_time()-smu.clock),0)),i,0);
 			else
@@ -146,7 +146,7 @@ public class MyGUI {
 				setLoadQueueTable(String.valueOf(smu.regs.getValue(smu.ldResStation[i].getIns().getRd() ) ),i,2 );
 			}
 		}catch(Exception e){
-			System.out.println(e);
+			//System.out.println(e);
 		}
 		try{
 			for(int i=0; i<3; ++i){
@@ -155,7 +155,7 @@ public class MyGUI {
 				setStoreQueueTable(String.valueOf(smu.regs.getValue(smu.stResStation[i].getIns().getRd() ) ),i,2 );
 			}
 		}catch(Exception e){
-			System.out.println(e);
+			//System.out.println(e);
 		}
 		//设定运行状态
 		for(int i = 0; i<instTotalNum; ++i){
@@ -217,7 +217,10 @@ public class MyGUI {
         //Get inst num and inst
         clearBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-							smu.reset();
+				smu.clearIns();
+				smu.readInstruction(instructionText.getText());
+				instTotalNum = smu.instructionVector.size();
+				instPreStatus = new int[instTotalNum];
             	clearExeStatusTable();
             	clearLoadQueueTable();
             	clearStoreQueueTable();
